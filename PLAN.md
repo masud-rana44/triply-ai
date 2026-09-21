@@ -18,18 +18,19 @@
 ## Phase 1: Environment, Tooling & Core Dependencies
 - [ ] Update `app.json`:
   - [ ] Set `web.output` to `"server"` (required for Expo Router `+api.ts` server routes)
-  - [ ] Confirm deep-linking `scheme: "triply"`
-  - [ ] Verify `expo-secure-store` and other config plugins
+  - [x] Confirm deep-linking `scheme: "triply"`
+  - [x] Verify `expo-secure-store` and other config plugins (`@clerk/expo`)
 - [ ] Install runtime dependencies:
-  - [ ] `@clerk/clerk-expo` (Authentication)
-  - [ ] `expo-secure-store` (Secure token caching)
+  - [x] `@clerk/expo` (Authentication)
+  - [x] `expo-secure-store` (Secure token caching)
+  - [x] `expo-auth-session` (OAuth / Browser SSO)
   - [ ] `drizzle-orm` & `@neondatabase/serverless` (Neon Postgres database client)
   - [ ] `inngest` (Background job workflows)
   - [ ] `svix` (Clerk webhook signature verification)
   - [ ] `@google/genai` (Gemini 1.5 Flash SDK)
   - [ ] `zod` (Strict schema validation for AI and API payloads)
   - [ ] `@tanstack/react-query` (Mobile polling & data caching)
-  - [ ] `@sentry/react-native` (Monitoring & error tracking)
+  - [x] `@sentry/react-native` (Monitoring & error tracking)
   - [ ] `dotenv` (Environment configuration)
 - [ ] Install dev dependencies:
   - [ ] `drizzle-kit` (Schema migrations)
@@ -38,16 +39,16 @@
   - [ ] `"inngest:dev": "npx inngest-cli@latest dev -u http://localhost:8081/api/inngest"`
   - [ ] `"db:generate": "drizzle-kit generate"`
   - [ ] `"db:push": "drizzle-kit push"`
-- [ ] Create `.env.example` documenting all required secrets:
-  - `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`
-  - `CLERK_SECRET_KEY`
-  - `CLERK_WEBHOOK_SECRET`
-  - `DATABASE_URL`
-  - `GEMINI_API_KEY`
-  - `UNSPLASH_ACCESS_KEY`
-  - `EXPO_PUBLIC_IMAGEKIT_URL_ENDPOINT`
-  - `SENTRY_DSN` / `EXPO_PUBLIC_SENTRY_DSN`
-  - `INNGEST_EVENT_KEY` / `INNGEST_SIGNING_KEY`
+- [x] Configure environment variables (`.env` configured with required secrets):
+  - [x] `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`
+  - [x] `CLERK_SECRET_KEY`
+  - [x] `CLERK_WEBHOOK_SIGNING_SECRET`
+  - [x] `DATABASE_URL`
+  - [x] `GEMINI_API_KEY`
+  - [x] `UNSPLASH_ACCESS_KEY`
+  - [x] `EXPO_PUBLIC_IMAGEKIT_URL_ENDPOINT`
+  - [x] `SENTRY_DSN` / `EXPO_PUBLIC_SENTRY_DSN`
+  - [x] `INNGEST_EVENT_KEY` / `INNGEST_SIGNING_KEY`
 
 ---
 
@@ -114,22 +115,24 @@
 ---
 
 ## Phase 5: Client Foundations & Auth Shell
-- [ ] Create `src/lib/token-cache.ts`:
-  - [ ] Implement Clerk token cache using `expo-secure-store`
+- [x] Configure token cache:
+  - [x] Implement Clerk token cache using `expo-secure-store` (`@clerk/expo/token-cache`)
 - [ ] Create `src/lib/query-client.ts`:
   - [ ] Configure TanStack Query client with sensible retry and stale-time defaults
 - [x] Create `src/lib/sentry.ts`:
   - [x] Initialize `@sentry/react-native` for client and error boundary monitoring
 - [ ] Update `src/app/_layout.tsx`:
-  - [ ] Wrap application with `ClerkProvider`, `QueryClientProvider`, and Sentry error boundary
+  - [x] Wrap application with `ClerkProvider` and Sentry error boundary
+  - [ ] Add `QueryClientProvider`
 
 ---
 
-## Phase 6: UI Screens & Flows *(Awaiting User Design Assets)*
-> *Note: UI implementation is paused until user provides design specs and assets.*
-- [ ] Welcome / Sign-In Screen (`src/app/(auth)/sign-in.tsx`):
-  - [ ] "Continue with Apple" button
-  - [ ] "Continue with Google" button
+## Phase 6: UI Screens & Flows
+- [x] Welcome / Sign-In Screen (`src/app/index.tsx` - Single-Page Auth Screen):
+  - [x] "Continue with Apple" button with custom SVG icon
+  - [x] "Continue with Google" button with custom SVG icon
+  - [x] Connected to Clerk `useSSO()` OAuth flow
+  - [x] Dark overlay and active session state display
 - [ ] Home / Dashboard Screen (`src/app/(main)/index.tsx`):
   - [ ] "Plan a New Trip" hero call-to-action
   - [ ] List of saved trips with status badges, destination hero cards, and delete action
