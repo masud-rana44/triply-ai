@@ -118,8 +118,8 @@
   - [ ] Implement Clerk token cache using `expo-secure-store`
 - [ ] Create `src/lib/query-client.ts`:
   - [ ] Configure TanStack Query client with sensible retry and stale-time defaults
-- [x] Create `src/lib/sentry.ts`:
-  - [x] Initialize `@sentry/react-native` for client and error boundary monitoring
+- [ ] Create `src/lib/sentry.ts`:
+  - [ ] Initialize `@sentry/react-native` for client and error boundary monitoring
 - [ ] Update `src/app/_layout.tsx`:
   - [ ] Wrap application with `ClerkProvider`, `QueryClientProvider`, and Sentry error boundary
 
