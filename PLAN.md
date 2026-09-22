@@ -16,29 +16,29 @@
 ---
 
 ## Phase 1: Environment, Tooling & Core Dependencies
-- [ ] Update `app.json`:
-  - [ ] Set `web.output` to `"server"` (required for Expo Router `+api.ts` server routes)
+- [x] Update `app.json`:
+  - [x] Set `web.output` to `"server"` (required for Expo Router `+api.ts` server routes)
   - [x] Confirm deep-linking `scheme: "triply"`
   - [x] Verify `expo-secure-store` and other config plugins (`@clerk/expo`)
 - [ ] Install runtime dependencies:
   - [x] `@clerk/expo` (Authentication)
   - [x] `expo-secure-store` (Secure token caching)
   - [x] `expo-auth-session` (OAuth / Browser SSO)
-  - [ ] `drizzle-orm` & `@neondatabase/serverless` (Neon Postgres database client)
-  - [ ] `inngest` (Background job workflows)
-  - [ ] `svix` (Clerk webhook signature verification)
+  - [x] `drizzle-orm` & `@neondatabase/serverless` (Neon Postgres database client)
+  - [x] `inngest` (Background job workflows)
+  - [x] `svix` (Clerk webhook signature verification)
   - [ ] `@google/genai` (Gemini 1.5 Flash SDK)
   - [ ] `zod` (Strict schema validation for AI and API payloads)
   - [ ] `@tanstack/react-query` (Mobile polling & data caching)
   - [x] `@sentry/react-native` (Monitoring & error tracking)
   - [ ] `dotenv` (Environment configuration)
 - [ ] Install dev dependencies:
-  - [ ] `drizzle-kit` (Schema migrations)
+  - [x] `drizzle-kit` (Schema migrations)
   - [ ] `@types/node` (Node type definitions)
-- [ ] Add helper scripts to `package.json`:
-  - [ ] `"inngest:dev": "npx inngest-cli@latest dev -u http://localhost:8081/api/inngest"`
-  - [ ] `"db:generate": "drizzle-kit generate"`
-  - [ ] `"db:push": "drizzle-kit push"`
+- [x] Add helper scripts to `package.json`:
+  - [x] `"inngest:dev": "npx inngest-cli@latest dev -u http://localhost:8081/api/inngest"`
+  - [x] `"db:generate": "drizzle-kit generate"`
+  - [x] `"db:push": "drizzle-kit push"`
 - [x] Configure environment variables (`.env` configured with required secrets):
   - [x] `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`
   - [x] `CLERK_SECRET_KEY`
@@ -53,9 +53,9 @@
 ---
 
 ## Phase 2: Database Layer (Neon Postgres & Drizzle ORM)
-- [ ] Create `drizzle.config.ts` configured for Neon Postgres (`postgresql` dialect)
-- [ ] Create `src/db/schema.ts`:
-  - [ ] Define `users` table (`id` [Clerk user ID], `email`, `firstName`, `lastName`, `imageUrl`, timestamps)
+- [x] Create `drizzle.config.ts` configured for Neon Postgres (`postgresql` dialect)
+- [x] Create `src/db/schema.ts`:
+  - [x] Define `users` table (`id` [Clerk user ID], `email`, `firstName`, `lastName`, `imageUrl`, timestamps)
   - [ ] Define `trips` table:
     - Primary key: `id` (UUID)
     - Foreign key: `userId` -> `users.id` (cascade delete)
@@ -63,8 +63,8 @@
     - Status: `status` (`PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`), `errorMessage`
     - Content: `heroImageUrl`, `itineraryData` (JSONB containing structured days & time slots)
     - Timestamps: `createdAt`, `updatedAt`
-- [ ] Create `src/db/index.ts` connecting `@neondatabase/serverless` with Drizzle ORM
-- [ ] Run `npm run db:push` to sync schema with Neon database
+- [x] Create `src/db/index.ts` connecting `@neondatabase/serverless` with Drizzle ORM
+- [x] Run `npm run db:push` to sync schema with Neon database
 
 ---
 
@@ -81,8 +81,12 @@
   - [ ] Add fallback curated destination imagery if Unsplash is unavailable or rate-limited
 - [ ] Create `src/lib/imagekit.ts`:
   - [ ] Implement URL transformation helper (WebP auto-format, DPR sizing, CDN proxy caching)
-- [ ] Create `src/inngest/client.ts`:
-  - [ ] Initialize Inngest client with ID `"triply"`
+- [x] Create `src/inngest/client.ts`:
+  - [x] Initialize Inngest client with ID `"triply"`
+- [x] Create `src/inngest/functions/sync-user.ts`:
+  - [x] Event triggers: `clerk/user.created` & `clerk/user.updated`
+  - [x] Upsert user to Neon Postgres `users` table via Drizzle ORM
+  - [x] Event trigger: `clerk/user.deleted` -> remove user from Neon Postgres `users` table
 - [ ] Create `src/inngest/functions/generate-trip.ts`:
   - [ ] Event trigger: `triply/trip.generate`
   - [ ] Step 1: Update trip status to `PROCESSING` in Neon
@@ -94,12 +98,13 @@
 ---
 
 ## Phase 4: Server API Routes (`+api.ts`)
-- [ ] Create `src/app/api/inngest+api.ts`:
-  - [ ] Serve Inngest webhook route handler (`GET`, `POST`, `PUT`) using Web Standard Request/Response
-- [ ] Create `src/app/api/webhooks/clerk+api.ts`:
-  - [ ] Verify incoming Svix signature with `CLERK_WEBHOOK_SECRET`
-  - [ ] Handle `user.created` and `user.updated` events (upsert to Neon `users` table)
-  - [ ] Handle `user.deleted` event (remove user from Neon)
+- [x] Create `src/app/api/inngest+api.ts`:
+  - [x] Serve Inngest webhook route handler (`GET`, `POST`, `PUT`) using Web Standard Request/Response
+- [x] Create `src/app/api/webhooks/clerk+api.ts`:
+  - [x] Verify incoming Svix signature with `CLERK_WEBHOOK_SECRET` / `CLERK_WEBHOOK_SIGNING_SECRET`
+  - [x] Parse verified webhook JSON payload
+  - [x] Forward `user.created` & `user.updated` events to Inngest (`clerk/user.created`, `clerk/user.updated`)
+  - [x] Forward `user.deleted` event to Inngest (`clerk/user.deleted`) with direct database sync fallback
 - [ ] Create `src/app/api/trips/generate+api.ts`:
   - [ ] Authenticate request with Clerk session headers
   - [ ] Enforce quota: Count trips created by `userId` in the last 24 hours (limit: 20)
@@ -158,9 +163,10 @@
 ---
 
 ## Phase 7: End-to-End Verification & Quality Bar
-- [ ] Run `npx tsc --noEmit` to verify strict TypeScript types
-- [ ] Start Inngest local dev server (`npm run inngest:dev`) and verify functions register on `http://localhost:8288`
-- [ ] Test Clerk webhook user sync with test event
+- [x] Run `npx tsc --noEmit` to verify strict TypeScript types
+- [x] Start Inngest local dev server (`npm run inngest:dev`) and verify functions register on `http://localhost:8288`
+- [x] Test Clerk webhook user sync with test event (`user.created`, `user.updated`, and `user.deleted` verified in Neon DB)
 - [ ] Test trip generation dispatch (`POST /api/trips/generate` -> Inngest -> Gemini -> Neon)
 - [ ] Verify 20 trips / 24 hours quota enforcement (request 21 returns HTTP 429)
 - [ ] Verify fallback image logic when Unsplash is unavailable
+
